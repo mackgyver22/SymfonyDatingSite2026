@@ -42,11 +42,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $updatedAt = null;
 
-    /**
-     * @var Collection<int, UserProfile>
-     */
-    #[ORM\OneToMany(targetEntity: UserProfile::class, mappedBy: 'user', orphanRemoval: true)]
-    private Collection $userProfiles;
+    #[ORM\OneToOne(targetEntity: UserProfile::class, mappedBy: 'user', orphanRemoval: true)]
+    private ?UserProfile $userProfile = null;
 
     /**
      * @var Collection<int, UserLikeDislike>
@@ -54,10 +51,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: UserLikeDislike::class, mappedBy: 'user')]
     private Collection $userLikeDislikes;
 
+    /**
+     * @var Collection<int, UserHobby>
+     */
+    #[ORM\OneToMany(targetEntity: UserHobby::class, mappedBy: 'user')]
+    private Collection $userHobbies;
+
     public function __construct()
     {
-        $this->userProfiles = new ArrayCollection();
         $this->userLikeDislikes = new ArrayCollection();
+        $this->userHobbies = new ArrayCollection();
     }
 
     #[ORM\PrePersist]
@@ -148,32 +151,22 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         // Clear temporary plain-text password if stored
     }
 
-    /**
-     * @return Collection<int, UserProfile>
-     */
-    public function getUserProfiles(): Collection
+    public function getUserProfile(): ?UserProfile
     {
-        return $this->userProfiles;
+        return $this->userProfile;
     }
 
-    public function addUserProfile(UserProfile $userProfile): static
+    public function setUserProfile(?UserProfile $userProfile): static
     {
-        if (!$this->userProfiles->contains($userProfile)) {
-            $this->userProfiles->add($userProfile);
+        if ($userProfile === null && $this->userProfile !== null) {
+            $this->userProfile->setUser(null);
+        }
+
+        if ($userProfile !== null && $userProfile->getUser() !== $this) {
             $userProfile->setUser($this);
         }
 
-        return $this;
-    }
-
-    public function removeUserProfile(UserProfile $userProfile): static
-    {
-        if ($this->userProfiles->removeElement($userProfile)) {
-            // set the owning side to null (unless already changed)
-            if ($userProfile->getUser() === $this) {
-                $userProfile->setUser(null);
-            }
-        }
+        $this->userProfile = $userProfile;
 
         return $this;
     }
@@ -202,6 +195,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             // set the owning side to null (unless already changed)
             if ($userLikeDislike->getUser() === $this) {
                 $userLikeDislike->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, UserHobby>
+     */
+    public function getUserHobbies(): Collection
+    {
+        return $this->userHobbies;
+    }
+
+    public function addUserHobby(UserHobby $userHobby): static
+    {
+        if (!$this->userHobbies->contains($userHobby)) {
+            $this->userHobbies->add($userHobby);
+            $userHobby->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUserHobby(UserHobby $userHobby): static
+    {
+        if ($this->userHobbies->removeElement($userHobby)) {
+            // set the owning side to null (unless already changed)
+            if ($userHobby->getUser() === $this) {
+                $userHobby->setUser(null);
             }
         }
 

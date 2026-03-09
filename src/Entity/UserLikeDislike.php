@@ -21,6 +21,9 @@ class UserLikeDislike
     #[ORM\JoinColumn(nullable: false)]
     private ?LikeDislike $like_relation = null;
 
+    #[ORM\Column]
+    private ?bool $does_like = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -46,6 +49,18 @@ class UserLikeDislike
     public function setLikeRelation(?LikeDislike $like_relation): static
     {
         $this->like_relation = $like_relation;
+
+        return $this;
+    }
+
+    public function isDoesLike(): ?bool
+    {
+        return $this->does_like;
+    }
+
+    public function setDoesLike(bool $does_like): static
+    {
+        $this->does_like = $does_like;
 
         return $this;
     }

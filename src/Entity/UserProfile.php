@@ -13,7 +13,7 @@ class UserProfile
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\ManyToOne(inversedBy: 'userProfiles')]
+    #[ORM\OneToOne(inversedBy: 'userProfile')]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $user = null;
 
@@ -28,6 +28,12 @@ class UserProfile
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $zip_code = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $gender = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $looking_for = null;
 
     public function getId(): ?int
     {
@@ -90,6 +96,30 @@ class UserProfile
     public function setZipCode(?string $zip_code): static
     {
         $this->zip_code = $zip_code;
+
+        return $this;
+    }
+
+    public function getGender(): ?string
+    {
+        return $this->gender;
+    }
+
+    public function setGender(?string $gender): static
+    {
+        $this->gender = $gender;
+
+        return $this;
+    }
+
+    public function getLookingFor(): ?string
+    {
+        return $this->looking_for;
+    }
+
+    public function setLookingFor(string $looking_for): static
+    {
+        $this->looking_for = $looking_for;
 
         return $this;
     }
